@@ -278,6 +278,7 @@ button:hover {
 .eliminar {
   background: #e74c3c;
   margin-left: 5px;
+  margin-right: 5px;
 }
 .modal {
   position: fixed;
