@@ -260,6 +260,7 @@ function enviarWhatsApp(v) {
 }
 .foto {
   width: 100%;
+  height:300px;
   border-radius: 6px;
   margin-bottom: 10px;
 }
