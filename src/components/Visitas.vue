@@ -393,7 +393,7 @@ onMounted(cargarVisitas)
   max-width: 500px;
   width: 90%;
   height: auto;
-  margin-top: 35vh;
+  margin-top: 32vh;
   border-radius: 10px;
 }
 .modal-content input,
@@ -502,7 +502,7 @@ onMounted(cargarVisitas)
   }
   .cards {
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 10px 20px;
   }
   .buscar {
     height: 35px;
