@@ -393,7 +393,7 @@ onMounted(cargarVisitas)
   max-width: 500px;
   width: 90%;
   height: auto;
-  margin-top: 20vh;
+  margin-top: 35vh;
   border-radius: 10px;
 }
 .modal-content input,
