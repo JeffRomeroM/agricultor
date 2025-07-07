@@ -3,8 +3,12 @@
     <div class="info">
       <img src="/logo.jpg" alt="" class="logo" />
       <h1>El agricultor</h1>
+      
+
     </div>
     <h3>Visitas de Campo</h3>
+    
+    <Dashboard :visible="mostrarDashboard" @cerrar="mostrarDashboard = false" />
 
     <div class="filtros">
       <input v-model="filtroNombre" placeholder="Buscar por productor" class="buscar" />
@@ -144,6 +148,8 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { supabase } from '../supabase.js'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import Dashboard from './Dashboard.vue'
+const mostrarDashboard = ref(false)
 
 const visitas = ref([])
 const mostrarModal = ref(false)
