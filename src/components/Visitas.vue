@@ -50,7 +50,7 @@
 
           <!-- Mapa -->
           <div id="mapa"></div>
-          <button type="button" @click="moverMarcadorAUbicacion" class="btn-ubicacion">
+          <button type="button" @click="obtenerUbicacion" class="btn-ubicacion">
             Usar ubicación actual
           </button>
           <p v-if="visita.latitud && visita.longitud" class="ubicacion-info">
@@ -332,28 +332,45 @@ async function cargarVisitas() {
 //     marcador.value.setLatLng(e.latlng)
 //   })
 // }
-async function obtenerUbicacion() {
+function obtenerUbicacion() {
   if (!navigator.geolocation) {
-    alert('Geolocalización no soportada')
+    alert('Geolocalización no soportada por este navegador.')
     return
   }
+
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      visita.latitud = pos.coords.latitude
-      visita.longitud = pos.coords.longitude
+      const lat = pos.coords.latitude
+      const lng = pos.coords.longitude
+
+      visita.latitud = lat
+      visita.longitud = lng
 
       if (map.value) {
-        marcador.value.setLatLng([visita.latitud, visita.longitud])
-        map.value.setView([visita.latitud, visita.longitud], 13)
-      } else {
-        initMapa()
+        map.value.setView([lat, lng], 17)
+        if (marcador.value) {
+          marcador.value.setLatLng([lat, lng])
+        } else {
+          marcador.value = L.marker([lat, lng], { draggable: true }).addTo(map.value)
+          marcador.value.on('dragend', () => {
+            const pos = marcador.value.getLatLng()
+            visita.latitud = pos.lat
+            visita.longitud = pos.lng
+          })
+        }
       }
     },
-    (err) => {
-      alert('Error obteniendo ubicación: ' + err.message)
+    (error) => {
+      alert('No se pudo obtener la ubicación: ' + error.message)
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
     }
   )
 }
+
 
 function moverMarcadorAUbicacion() {
   if (!navigator.geolocation) {
