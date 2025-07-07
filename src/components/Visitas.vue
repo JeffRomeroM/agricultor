@@ -50,10 +50,14 @@
 
           <!-- Mapa -->
           <div id="mapa"></div>
-
+          <button type="button" @click="moverMarcadorAUbicacion" class="btn-ubicacion">
+            Usar ubicación actual
+          </button>
           <p v-if="visita.latitud && visita.longitud" class="ubicacion-info">
             Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
           </p>
+          
+
 
           <button type="submit" :disabled="subiendoFoto" class="btn-guardar">
             {{ subiendoFoto ? 'Subiendo...' : 'Guardar' }}
@@ -105,6 +109,9 @@
           <p v-if="Number.isFinite(visita.latitud) && Number.isFinite(visita.longitud)" class="ubicacion-info">
             Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
           </p>
+          <a :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank" rel="noopener noreferrer">
+              Ver en Google Maps
+          </a>
 
 
 
@@ -296,6 +303,84 @@ async function cargarVisitas() {
   if (data) visitas.value = data
 }
 
+// function initMapa() {
+//   if (map.value) {
+//     map.value.remove()
+//     map.value = null
+//     marcador.value = null
+//   }
+
+//   const latInit = visita.latitud || 12.131
+//   const lngInit = visita.longitud || -86.2504
+//   map.value = L.map('mapa').setView([latInit, lngInit], 13)
+//   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     attribution: '© OpenStreetMap contributors'
+//   }).addTo(map.value)
+
+//   marcador.value = L.marker([latInit, lngInit], { draggable: true }).addTo(map.value)
+
+//   marcador.value.on('dragend', () => {
+//     const pos = marcador.value.getLatLng()
+//     visita.latitud = pos.lat
+//     visita.longitud = pos.lng
+//   })
+
+//   map.value.on('click', (e) => {
+//     const { lat, lng } = e.latlng
+//     visita.latitud = lat
+//     visita.longitud = lng
+//     marcador.value.setLatLng(e.latlng)
+//   })
+// }
+async function obtenerUbicacion() {
+  if (!navigator.geolocation) {
+    alert('Geolocalización no soportada')
+    return
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      visita.latitud = pos.coords.latitude
+      visita.longitud = pos.coords.longitude
+
+      if (map.value) {
+        marcador.value.setLatLng([visita.latitud, visita.longitud])
+        map.value.setView([visita.latitud, visita.longitud], 13)
+      } else {
+        initMapa()
+      }
+    },
+    (err) => {
+      alert('Error obteniendo ubicación: ' + err.message)
+    }
+  )
+}
+
+function moverMarcadorAUbicacion() {
+  if (!navigator.geolocation) {
+    alert('Geolocalización no soportada por el navegador')
+    return
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude
+      const lng = pos.coords.longitude
+
+      visita.latitud = lat
+      visita.longitud = lng
+
+      if (marcador.value) {
+        marcador.value.setLatLng([lat, lng])
+      }
+      if (map.value) {
+        map.value.setView([lat, lng], 13)
+      }
+    },
+    (err) => {
+      alert('Error al obtener ubicación: ' + err.message)
+    }
+  )
+}
+
 function initMapa() {
   if (map.value) {
     map.value.remove()
@@ -438,6 +523,19 @@ onMounted(cargarVisitas)
   margin-top: 32vh;
   border-radius: 10px;
 }
+
+
+.btn-ubicacion {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+
 .modal-content input,
 .modal-content textarea,
 .modal-content select {
