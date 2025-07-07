@@ -10,6 +10,8 @@
         <div class="filtros-dashboard">
           <label>Filtrar por mes:</label>
           <input type="month" v-model="mesSeleccionado" @change="filtrarPorMes" />
+          <button @click="limpiarFiltros" class="btn-limpiar">Limpiar filtros</button>
+
         </div>
 
         <canvas ref="graficoTecnicos"></canvas>
@@ -31,6 +33,7 @@ const graficoTecnicos = ref(null)
 const graficoComunidades = ref(null)
 let chart1 = null
 let chart2 = null
+
 
 import { supabase } from '../supabase.js'
 
@@ -62,6 +65,11 @@ function filtrarPorMes() {
   })
   renderizarGraficos(visitasFiltradas)
 }
+function limpiarFiltros() {
+  mesSeleccionado.value = ''
+  renderizarGraficos(visitas.value)
+}
+
 
 function renderizarGraficos(data) {
   const tecnicos = {}
@@ -183,6 +191,18 @@ canvas {
   margin-top: 20px;
   max-height: 400px;
 }
+.btn-limpiar {
+  background: #2ecc71;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+
 
 @media (max-width: 600px) {
   .modal-content-dashboard {
@@ -196,6 +216,10 @@ canvas {
     box-sizing: border-box;
     height: 100vh; /* para que no exceda altura de pantalla */
     overflow-y: auto;
+  }
+  .btn-limpiar {
+    margin-left: 0;
+    margin-top: 10px;
   }
     .btn-dashboard {
         width: 50%;
