@@ -96,12 +96,20 @@
             </li>
           </ul>
 
-          <p v-if="detalle.latitud && detalle.longitud">
+          <!-- <p v-if="detalle.latitud && detalle.longitud">
             <strong>Ubicación:</strong>
             <a :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank" rel="noopener noreferrer">
               Ver en Google Maps
             </a>
+          </p> -->
+          <p v-if="Number.isFinite(visita.latitud) && Number.isFinite(visita.longitud)" class="ubicacion-info">
+            Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
           </p>
+
+
+
+
+
           <div class="acciones">
             <button @click="editar(detalle)">Editar</button>
             <button class="eliminar" @click="confirmarEliminar(detalle.id)">Eliminar</button>
@@ -174,7 +182,6 @@ function limpiarFiltros() {
   filtroNombre.value = ''
   filtroFecha.value = ''
 }
-
 function abrirModal() {
   Object.assign(visita, {
     id: null, productor: '', cultivo: '', hallazgos: '', celular: '',
@@ -183,8 +190,16 @@ function abrirModal() {
   })
   mostrarModal.value = true
   editando.value = false
-  setTimeout(initMapa, 300)
+
+  // Espera a que el DOM actualice
+  nextTick(() => {
+    setTimeout(initMapa, 100) // pequeño delay para asegurar que el #mapa exista
+  })
 }
+
+
+
+import { nextTick } from 'vue'
 
 function cerrarModal() {
   mostrarModal.value = false
@@ -204,13 +219,20 @@ function cerrarDetalle() {
   modalDetalle.value = false
 }
 
-function editar(v) {
+
+async function editar(v) {
   Object.assign(visita, v)
+  visita.latitud = Number(v.latitud)
+  visita.longitud = Number(v.longitud)
   mostrarModal.value = true
   editando.value = true
   modalDetalle.value = false
-  setTimeout(initMapa, 300)
+
+  await nextTick()
+  initMapa()
 }
+
+
 
 function confirmarEliminar(id) {
   idEliminar.value = id
