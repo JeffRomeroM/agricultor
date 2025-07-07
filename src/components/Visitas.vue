@@ -33,9 +33,9 @@
         <form @submit.prevent="guardarVisita">
           <input v-model="visita.productor" placeholder="Nombre del productor" required />
           <input v-model="visita.celular" placeholder="Celular" type="tel" />
+          <input v-model="visita.comunidad" placeholder="Comunidad" required />
           <input v-model="visita.cultivo" placeholder="Cultivo" required />
           <input v-model="visita.area" placeholder="Área de cultivo" />
-          <input v-model="visita.comunidad" placeholder="Comunidad" required />
           <textarea v-model="visita.hallazgos" placeholder="Principales Hallazgos"></textarea>
           <textarea v-model="visita.recomendaciones" placeholder="Recomendaciones"></textarea>
           <textarea v-model="visita.observaciones" placeholder="Observaciones"></textarea>
@@ -73,12 +73,28 @@
           <p><strong>Celular:</strong> {{ detalle.celular }}</p>
           <p><strong>Cultivo:</strong> {{ detalle.cultivo }}</p>
           <p><strong>Área:</strong> {{ detalle.area }}</p>
-          <p><strong>Hallazgos:</strong> {{ detalle.hallazgos }}</p>
           <p><strong>Comunidad:</strong> {{ detalle.comunidad }}</p>
           <p><strong>Fecha:</strong> {{ detalle.fecha }}</p>
           <p><strong>Técnico:</strong> {{ detalle.tecnico }}</p>
-          <p><strong>Observaciones:</strong> {{ detalle.observaciones }}</p>
-          <p><strong>Recomendaciones:</strong> {{ detalle.recomendaciones }}</p>
+
+          <p><strong>Hallazgos:</strong></p>
+          <ul>
+            <li class="lista" v-for="linea in detalle.hallazgos?.split('\n')" :key="linea">
+              {{ linea.replace(/^[-•]\s*/, '') }}
+            </li>
+          </ul>
+          <p><strong>Observaciones:</strong></p>
+          <ul>
+            <li class="lista" v-for="linea in detalle.observaciones?.split('\n')" :key="linea">
+              {{ linea.replace(/^[-•]\s*/, '') }}
+            </li>
+          </ul>
+          <p><strong>Recomendaciones:</strong></p>
+          <ul>
+            <li class="lista" v-for="linea in detalle.recomendaciones?.split('\n')" :key="linea">
+              {{ linea.replace(/^[-•]\s*/, '') }}
+            </li>
+          </ul>
 
           <p v-if="detalle.latitud && detalle.longitud">
             <strong>Ubicación:</strong>
@@ -248,10 +264,10 @@ async function eliminar(id) {
 
 function enviarWhatsApp(v) {
   if (!v.celular) return alert('Número de celular no disponible')
-  const mensaje = `👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos || 'Ninguno'}\n📋 Observaciones: ${v.observaciones || 'Ninguna'}\n✅ Recomendaciones: ${v.recomendaciones || 'Ninguna'}\n📅 Fecha: ${v.fecha}`
+  const mensaje = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos || 'Ninguno'}\n📋 Observaciones: ${v.observaciones || 'Ninguna'}\n✅ Recomendaciones: ${v.recomendaciones || 'Ninguna'}`
   const url = `https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(mensaje)}`
   window.open(url, '_blank')
-}
+} 
 
 async function cargarVisitas() {
   const { data } = await supabase.from('visitas').select('*')
@@ -321,6 +337,10 @@ onMounted(cargarVisitas)
   text-align: center;
   margin-bottom: 5px;
   margin-top: -10px;
+}
+.lista{
+  margin-top: 10px;
+  margin-left: 20px;
 }
 .filtros {
   display: flex;
