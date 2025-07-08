@@ -25,6 +25,14 @@
         @click="verDetalle(v)"
       >
         <img v-if="v.foto_url" :src="v.foto_url" class="preview-foto" />
+        <div
+          v-else
+          class="preview-foto inicial-foto"
+          :style="{ backgroundColor: generarColor(v.productor) }"
+        >
+          {{ v.productor?.charAt(0).toUpperCase() || '?' }}
+        </div>
+
         <p class="preview-productor">{{ v.productor }}</p>
         <p>{{ v.comunidad }}</p>
       </div>
@@ -163,6 +171,18 @@ const filtroNombre = ref('')
 const filtroFecha = ref('')
 const map = ref(null)
 const marcador = ref(null)
+
+
+function generarColor(nombre) {
+  // Generar un color basado en el nombre para que sea siempre igual
+  let hash = 0
+  for (let i = 0; i < nombre.length; i++) {
+    hash = nombre.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const color = `hsl(${hash % 360}, 70%, 60%)`
+  return color
+}
+
 
 const visita = reactive({
   id: null,
@@ -525,6 +545,17 @@ onMounted(cargarVisitas)
 .preview-productor {
   font-weight: bold;
 }
+.inicial-foto {
+  background-color: #2ecc71;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 55px;
+  box-sizing: border-box;
+  font-weight: bold;
+}
+
 .modal {
   position: fixed;
   top: 0; left: 0;

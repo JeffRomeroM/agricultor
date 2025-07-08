@@ -10,7 +10,7 @@
         <div class="filtros-dashboard">
           <label>Filtrar por mes:</label>
           <input type="month" v-model="mesSeleccionado" @change="filtrarPorMes" />
-          <button @click="limpiarFiltros" class="btn-limpiar">Limpiar filtros</button>
+          <button @click="limpiarFiltros" class="btn-limpiar">Limpiar</button>
 
         </div>
 
@@ -88,7 +88,7 @@ function renderizarGraficos(data) {
     data: {
       labels: Object.keys(tecnicos),
       datasets: [{
-        label: 'Visitas por Técnico',
+        label: 'Visitas',
         data: Object.values(tecnicos),
         backgroundColor: '#2ecc71'
       }]
@@ -107,7 +107,7 @@ function renderizarGraficos(data) {
     data: {
       labels: Object.keys(comunidades),
       datasets: [{
-        label: 'Comunidades más visitadas',
+        label: 'Visitas',
         data: Object.values(comunidades),
         backgroundColor: [
           '#3498db', '#9b59b6', '#f1c40f', '#e74c3c', '#1abc9c'
