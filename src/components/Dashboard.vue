@@ -2,13 +2,13 @@
   <div>
     <button @click="abrirDashboard" class="btn-dashboard">📊Dashboard</button>
     
-    <button class="btn-exportar">Descargar visitas a Excel</button>
+   
 
     <div class="modal" v-if="mostrarDashboard">
       <div class="modal-content-dashboard">
         <button class="cerrar" @click="cerrarDashboard">X</button>
         <h2>Dashboard de Visitas</h2>
-
+        <button class="btn-exportar">Descargar visitas a Excel</button>
         <div class="filtros-dashboard">
           <label>Filtrar por mes:</label>
           <input type="month" v-model="mesSeleccionado" @change="filtrarPorMes" />
