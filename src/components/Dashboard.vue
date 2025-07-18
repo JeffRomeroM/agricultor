@@ -1,6 +1,8 @@
 <template>
   <div>
     <button @click="abrirDashboard" class="btn-dashboard">📊Dashboard</button>
+    
+    <button class="btn-exportar">Descargar visitas a Excel</button>
 
     <div class="modal" v-if="mostrarDashboard">
       <div class="modal-content-dashboard">
@@ -183,6 +185,16 @@ onMounted(cargarVisitas)
   gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+}
+
+.btn-exportar {
+  background-color: #2ecc71 !important;
+  color: white;
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 canvas {
