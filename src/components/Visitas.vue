@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div class="info">
-      <img src="/logo.jpg" alt="" class="logo" />
+      <img src="/logo.png" alt="" class="logo" />
       <h1>El agricultor</h1>
       
 
@@ -329,35 +329,7 @@ async function cargarVisitas() {
   if (data) visitas.value = data
 }
 
-// function initMapa() {
-//   if (map.value) {
-//     map.value.remove()
-//     map.value = null
-//     marcador.value = null
-//   }
 
-//   const latInit = visita.latitud || 12.131
-//   const lngInit = visita.longitud || -86.2504
-//   map.value = L.map('mapa').setView([latInit, lngInit], 13)
-//   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//     attribution: '© OpenStreetMap contributors'
-//   }).addTo(map.value)
-
-//   marcador.value = L.marker([latInit, lngInit], { draggable: true }).addTo(map.value)
-
-//   marcador.value.on('dragend', () => {
-//     const pos = marcador.value.getLatLng()
-//     visita.latitud = pos.lat
-//     visita.longitud = pos.lng
-//   })
-
-//   map.value.on('click', (e) => {
-//     const { lat, lng } = e.latlng
-//     visita.latitud = lat
-//     visita.longitud = lng
-//     marcador.value.setLatLng(e.latlng)
-//   })
-// }
 function obtenerUbicacion() {
   if (!navigator.geolocation) {
     alert('Geolocalización no soportada por este navegador.')
