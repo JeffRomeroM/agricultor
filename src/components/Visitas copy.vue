@@ -19,8 +19,8 @@
 
     <div class="cards">
       <div
-    
-         v-for="v in visitasPaginadas" :key="v.id"
+        v-for="v in visitasFiltradas"
+        :key="v.id"
         class="card"
         @click="verDetalle(v)"
       >
@@ -148,11 +148,6 @@
         </div>
       </div>
     </div>
-    <div class="paginacion">
-      <button @click="pagina--" :disabled="pagina === 1">Anterior</button>
-      <span>Página {{ pagina }} de {{ totalPaginas }}</span>
-      <button @click="pagina++" :disabled="pagina >= totalPaginas">Siguiente</button>
-    </div>
   </div>
 </template>
 
@@ -176,22 +171,6 @@ const filtroNombre = ref('')
 const filtroFecha = ref('')
 const map = ref(null)
 const marcador = ref(null)
-
-const pagina = ref(1)
-const porPagina = 10
-
-const totalPaginas = computed(() => Math.ceil(visitasFiltradas.value.length / porPagina))
-
-const visitasPaginadas = computed(() => {
-  const inicio = (pagina.value - 1) * porPagina
-  return visitasFiltradas.value.slice(inicio, inicio + porPagina)
-})
-
-const tecnicosUnicos = computed(() => {
-  const set = new Set(visitas.value.map((v) => v.tecnico))
-  return Array.from(set)
-})
-
 
 
 function generarColor(nombre) {
@@ -604,7 +583,6 @@ onMounted(cargarVisitas)
   border-radius: 5px;
   cursor: pointer;
   margin-right: 10px;
-  margin-left: 3px;
   font-weight: 600;
 }
 .btn-cancelar {
@@ -683,29 +661,6 @@ onMounted(cargarVisitas)
   font-size: 0.9em;
   color: #555;
 }
-
-.paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.paginacion button {
-  padding: 0.2rem 0.5rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #2ecc71;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9em;
-  
-}
-.paginacion button:disabled {
-  background-color: #53f597;
-  cursor: not-allowed;
-}
-
 @media (max-width: 600px) {
   .card {
     width: 95%;
