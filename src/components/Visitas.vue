@@ -17,6 +17,10 @@
       <button @click="limpiarFiltros" class="limpiar">Limpiar</button>
     </div>
 
+    <div v-if="cargando" class="loader-container">
+      <div class="loader"></div>
+      <span class="loader-text">Cargando visitas...</span>
+    </div>
     <div class="cards">
       <div
     
@@ -180,6 +184,9 @@ const marcador = ref(null)
 const pagina = ref(1)
 const porPagina = 10
 
+
+const cargando = ref(false)
+
 const totalPaginas = computed(() => Math.ceil(visitasFiltradas.value.length / porPagina))
 
 const visitasPaginadas = computed(() => {
@@ -312,7 +319,53 @@ async function subirFoto(e) {
   subiendoFoto.value = false
 }
 
+// async function guardarVisita() {
+//   const datos = { ...visita }
+//   delete datos.id
+//   let res
+//   if (editando.value && visita.id) {
+//     res = await supabase.from('visitas').update(datos).eq('id', visita.id)
+//   } else {
+//     res = await supabase.from('visitas').insert([datos])
+//   }
+//   if (!res.error) {
+//     cerrarModal()
+//     cargarVisitas()
+//   }
+// }
+
+// async function eliminar(id) {
+//   const { data } = await supabase.from('visitas').select('foto_url').eq('id', id).single()
+//   if (data?.foto_url) {
+//     const path = data.foto_url.split('/public/')[1]
+//     if (path) await supabase.storage.from('fotos').remove([path])
+//   }
+//   await supabase.from('visitas').delete().eq('id', id)
+//   cerrarModalEliminar()
+//   cargarVisitas()
+// }
+
+function enviarWhatsApp(v) {
+  if (!v.celular) return alert('Número de celular no disponible')
+  const mensaje = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos || 'Ninguno'}\n📋 Observaciones: ${v.observaciones || 'Ninguna'}\n✅ Recomendaciones: ${v.recomendaciones || 'Ninguna'}`
+  const url = `https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(mensaje)}`
+  window.open(url, '_blank')
+} 
+
+// async function cargarVisitas() {
+//   const { data } = await supabase.from('visitas').select('*')
+//   if (data) visitas.value = data
+// }
+// ...existing code...
+async function cargarVisitas() {
+  cargando.value = true
+  const { data } = await supabase.from('visitas').select('*')
+  if (data) visitas.value = data
+  cargando.value = false
+}
+
 async function guardarVisita() {
+  cargando.value = true
   const datos = { ...visita }
   delete datos.id
   let res
@@ -323,11 +376,13 @@ async function guardarVisita() {
   }
   if (!res.error) {
     cerrarModal()
-    cargarVisitas()
+    await cargarVisitas()
   }
+  cargando.value = false
 }
 
 async function eliminar(id) {
+  cargando.value = true
   const { data } = await supabase.from('visitas').select('foto_url').eq('id', id).single()
   if (data?.foto_url) {
     const path = data.foto_url.split('/public/')[1]
@@ -335,21 +390,10 @@ async function eliminar(id) {
   }
   await supabase.from('visitas').delete().eq('id', id)
   cerrarModalEliminar()
-  cargarVisitas()
+  await cargarVisitas()
+  cargando.value = false
 }
-
-function enviarWhatsApp(v) {
-  if (!v.celular) return alert('Número de celular no disponible')
-  const mensaje = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos || 'Ninguno'}\n📋 Observaciones: ${v.observaciones || 'Ninguna'}\n✅ Recomendaciones: ${v.recomendaciones || 'Ninguna'}`
-  const url = `https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(mensaje)}`
-  window.open(url, '_blank')
-} 
-
-async function cargarVisitas() {
-  const { data } = await supabase.from('visitas').select('*')
-  if (data) visitas.value = data
-}
-
+// ...existing code...
 
 function obtenerUbicacion() {
   if (!navigator.geolocation) {
@@ -459,6 +503,35 @@ onMounted(cargarVisitas)
   border: 1px solid #ccc;
   z-index: 1;
 }
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.loader {
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #2ecc71;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loader-text {
+  color: #2ecc71;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+
 .app {
   max-width: 900px;
   margin: auto;
