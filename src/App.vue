@@ -8,8 +8,8 @@ import Chatbot from './components/Chatbot.vue';
 <template>
   <div class="main">
     <Visitas /> 
-     <!-- <Chatbot />
-     <Productos />  -->
+     <!-- <Chatbot />-->
+     <!-- <Productos />   -->
   </div>
   
   

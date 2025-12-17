@@ -84,63 +84,91 @@
     </div>
 
     <!-- Modal Detalle -->
-    <div class="modal pantalla-completa" v-if="modalDetalle">
-      <div class="modal-detalle">
-        <button class="cerrar" @click="cerrarDetalle">X</button>
-        <img v-if="detalle.foto_url" :src="detalle.foto_url" class="detalle-foto" />
-        <div class="detalle-info">
-          <p><strong>Productor:</strong> {{ detalle.productor }}</p>
-          <p><strong>Celular:</strong> {{ detalle.celular }}</p>
-          <p><strong>Cultivo:</strong> {{ detalle.cultivo }}</p>
-          <p><strong>Área:</strong> {{ detalle.area }}</p>
-          <p><strong>Comunidad:</strong> {{ detalle.comunidad }}</p>
-          <p><strong>Fecha:</strong> {{ detalle.fecha }}</p>
-          <p><strong>Técnico:</strong> {{ detalle.tecnico }}</p>
+    <!-- Modal Detalle Profesional -->
+<div class="modal pantalla-completa" v-if="modalDetalle">
+  <div class="modal-detalle card-detalle">
+    <button class="cerrar" @click="cerrarDetalle">✕</button>
+    
 
-          <p><strong>Hallazgos:</strong></p>
-          <ul>
-            <li class="lista" v-for="linea in detalle.hallazgos?.split('\n')" :key="linea">
-              {{ linea.replace(/^[-•]\s*/, '') }}
-            </li>
-          </ul>
-          <p><strong>Observaciones:</strong></p>
-          <ul>
-            <li class="lista" v-for="linea in detalle.observaciones?.split('\n')" :key="linea">
-              {{ linea.replace(/^[-•]\s*/, '') }}
-            </li>
-          </ul>
-          <p><strong>Recomendaciones:</strong></p>
-          <ul>
-            <li class="lista" v-for="linea in detalle.recomendaciones?.split('\n')" :key="linea">
-              {{ linea.replace(/^[-•]\s*/, '') }}
-            </li>
-          </ul>
-
-          <!-- <p v-if="detalle.latitud && detalle.longitud">
-            <strong>Ubicación:</strong>
-            <a :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank" rel="noopener noreferrer">
-              Ver en Google Maps
-            </a>
-          </p> -->
-          <p v-if="Number.isFinite(visita.latitud) && Number.isFinite(visita.longitud)" class="ubicacion-info">
-            Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
-          </p>
-          <a :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank" rel="noopener noreferrer">
-              Ver en Google Maps
-          </a>
-
-
-
-
-
-          <div class="acciones">
-            <button @click="editar(detalle)">Editar</button>
-            <button class="eliminar" @click="confirmarEliminar(detalle.id)">Eliminar</button>
-            <button @click="enviarWhatsApp(detalle)">Enviar WhatsApp</button>
-          </div>
-        </div>
+    <!-- Imagen -->
+    <div class="detalle-imagen">
+      <img
+        v-if="detalle.foto_url"
+        :src="detalle.foto_url"
+        alt="Foto visita"
+      />
+      <div v-else class="imagen-placeholder">
+        {{ detalle.productor?.charAt(0).toUpperCase() || '?' }}
       </div>
     </div>
+
+    <!-- Título -->
+     <h3 class="subtitulo"> {{ detalle.fecha }}
+     </h3>  
+    <h2 class="titulo-detalle">{{ detalle.productor }}</h2>
+    
+
+    <!-- Datos -->
+    <div class="seccion">
+      <h3>📋 Datos generales</h3>
+      <div class="grid-datos">
+        <span><strong>👨‍🔧</strong> {{ detalle.tecnico }}</span>
+        <span><strong>🌱 Cultivo:</strong> {{ detalle.cultivo }}</span>
+        
+        <span><strong>📞 Celular:</strong> {{ detalle.celular || 'N/D' }}</span>
+        <span><strong>📍 Comunidad:</strong> {{ detalle.comunidad }}</span>
+        <span><strong>🗺️ Área:</strong> {{ detalle.area }}</span>
+      </div>
+    </div>
+
+    <!-- Hallazgos -->
+    <div class="seccion">
+      <h3>🔍 Hallazgos</h3>
+      <ul>
+        <li v-for="l in detalle.hallazgos?.split('\n')" :key="l">
+          {{ l.replace(/^[-•]\s*/, '') }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="seccion">
+      <h3>📝 Observaciones</h3>
+      <ul>
+        <li v-for="l in detalle.observaciones?.split('\n')" :key="l">
+          {{ l.replace(/^[-•]\s*/, '') }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="seccion">
+      <h3>✅ Recomendaciones</h3>
+      <ul>
+        <li v-for="l in detalle.recomendaciones?.split('\n')" :key="l">
+          {{ l.replace(/^[-•]\s*/, '') }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Ubicación -->
+    <a
+      v-if="detalle.latitud && detalle.longitud"
+      class="link-mapa"
+      :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`"
+      target="_blank"
+    >
+      📍 Ver ubicación en Google Maps
+    </a>
+
+    <!-- Acciones -->
+    <div class="acciones-detalle">
+      <button @click="editar(detalle)">✏️ Editar</button>
+      <button class="eliminar" @click="confirmarEliminar(detalle.id)">🗑 Eliminar</button>
+      <button @click="enviarWhatsApp(detalle)">📤 WhatsApp</button>
+    </div>
+  </div>
+</div>
 
     <!-- Confirmación Eliminar -->
     <div class="modal" v-if="mostrarModalEliminar">
@@ -802,4 +830,93 @@ onMounted(cargarVisitas)
     font-size: 30px;
   }
 }
+
+.card-detalle {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.detalle-imagen img,
+.imagen-placeholder {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.imagen-placeholder {
+  background: #2ecc71;
+  color: white;
+  font-size: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.titulo-detalle {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.subtitulo {
+  text-align: end;
+  color: #000000;
+  margin-top: 10px !important;
+  margin-left: 50%;
+}
+
+.seccion {
+  margin-top: 20px;
+  background-color: #fafafa;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.seccion h3 {
+  margin-bottom: 8px;
+  color: #2ecc71;
+}
+
+.grid-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  font-size: 0.95em;
+}
+
+.seccion ul {
+  padding-left: 18px;
+}
+
+.link-mapa {
+  display: block;
+  margin: 15px 0;
+  color: #3498db;
+  font-weight: 600;
+  text-align: center;
+}
+
+.acciones-detalle {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.acciones-detalle button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #2ecc71;
+  color: white;
+  cursor: pointer;
+}
+
+.acciones-detalle .eliminar {
+  background: #e74c3c;
+}
+
 </style>
