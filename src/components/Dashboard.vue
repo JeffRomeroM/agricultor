@@ -1,22 +1,27 @@
 <template>
-  <div>
-    <button @click="abrirDashboard" class="btn-dashboard">📊Dashboard</button>
-    
-   
+  <div class="dashboard-container">
+    <div class="header-dashboard">
+      <h2>Dashboard de Visitas</h2>
+      <button class="btn-exportar" @click="exportarExcel">
+        <Icon icon="mdi:microsoft-excel" /> Descargar visitas
+      </button>
+    </div>
 
-    <div class="modal" v-if="mostrarDashboard">
-      <div class="modal-content-dashboard">
-        <button class="cerrar" @click="cerrarDashboard">X</button>
-        <h2>Dashboard de Visitas</h2>
-        <button class="btn-exportar">Descargar visitas a Excel</button>
-        <div class="filtros-dashboard">
-          <label>Filtrar por mes:</label>
-          <input type="month" v-model="mesSeleccionado" @change="filtrarPorMes" />
-          <button @click="limpiarFiltros" class="btn-limpiar">Limpiar</button>
+    <div class="filtros-dashboard">
+      <div class="input-group">
+        <label>Filtrar por mes:</label>
+        <input type="month" v-model="mesSeleccionado" @change="filtrarPorMes" />
+      </div>
+      <button @click="limpiarFiltros" class="btn-limpiar">
+        <Icon icon="mdi:broom" /> Limpiar
+      </button>
+    </div>
 
-        </div>
-
+    <div class="graficos-grid">
+      <div class="chart-card">
         <canvas ref="graficoTecnicos"></canvas>
+      </div>
+      <div class="chart-card">
         <canvas ref="graficoComunidades"></canvas>
       </div>
     </div>
@@ -24,38 +29,27 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { Chart, registerables } from 'chart.js'
+import { Icon } from '@iconify/vue'
+import { supabase } from '../supabase.js'
+
 Chart.register(...registerables)
 
 const visitas = ref([])
-const mostrarDashboard = ref(false)
 const mesSeleccionado = ref('')
 const graficoTecnicos = ref(null)
 const graficoComunidades = ref(null)
 let chart1 = null
 let chart2 = null
 
-
-import { supabase } from '../supabase.js'
-
 async function cargarVisitas() {
   const { data } = await supabase.from('visitas').select('*')
-  if (data) visitas.value = data
-}
-
-function abrirDashboard() {
-  mostrarDashboard.value = true
-  mesSeleccionado.value = ''
-  nextTick(() => {
-    renderizarGraficos(visitas.value)
-  })
-}
-
-function cerrarDashboard() {
-  mostrarDashboard.value = false
-  chart1?.destroy()
-  chart2?.destroy()
+  if (data) {
+    visitas.value = data
+    // Renderizamos automáticamente al cargar los datos
+    nextTick(() => renderizarGraficos(visitas.value))
+  }
 }
 
 function filtrarPorMes() {
@@ -67,11 +61,11 @@ function filtrarPorMes() {
   })
   renderizarGraficos(visitasFiltradas)
 }
+
 function limpiarFiltros() {
   mesSeleccionado.value = ''
   renderizarGraficos(visitas.value)
 }
-
 
 function renderizarGraficos(data) {
   const tecnicos = {}
@@ -92,34 +86,33 @@ function renderizarGraficos(data) {
       datasets: [{
         label: 'Visitas',
         data: Object.values(tecnicos),
-        backgroundColor: '#2ecc71'
+        backgroundColor: '#d19a02' // Usando tu color primario
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        title: { display: true, text: 'Visitas por Técnico' }
+        title: { display: true, text: 'Visitas por Técnico', font: { size: 16 } }
       }
     }
   })
 
   chart2 = new Chart(graficoComunidades.value, {
-    type: 'pie',
+    type: 'doughnut', // Cambiado a doughnut para un look más moderno
     data: {
       labels: Object.keys(comunidades),
       datasets: [{
-        label: 'Visitas',
         data: Object.values(comunidades),
-        backgroundColor: [
-          '#3498db', '#9b59b6', '#f1c40f', '#e74c3c', '#1abc9c'
-        ]
+        backgroundColor: ['#3498db', '#9b59b6', '#f1c40f', '#e74c3c', '#1abc9c', '#d19a02']
       }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        title: { display: true, text: 'Comunidades más visitadas' }
+        title: { display: true, text: 'Distribución por Comunidad', font: { size: 16 } }
       }
     }
   })
@@ -129,124 +122,106 @@ onMounted(cargarVisitas)
 </script>
 
 <style scoped>
-.btn-dashboard {
-  background: #2ecc71;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  overflow-y: auto;
-  padding: 20px; /* para que no toque bordes en móvil */
-  box-sizing: border-box;
-}
-
-.modal-content-dashboard {
-  background: white;
+.dashboard-container {
   padding: 20px;
-  width: 100%;
   max-width: 1200px;
-  border-radius: 10px;
-  position: relative;
-  box-sizing: border-box;
-  max-height: 90vh; /* para que no exceda altura de pantalla */
-  overflow-y: auto;
+  margin: 0 auto;
 }
 
-.cerrar {
-  position: absolute;
-  top: 2px;
-  right: 10px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  padding: 5px 10px;
-  font-size: 16px;
-  cursor: pointer;
+.header-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-dashboard h2 {
+  color: #1e293b;
+  margin: 0;
 }
 
 .filtros-dashboard {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 12px;
+  align-items: flex-end;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.graficos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.chart-card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  height: 350px; /* Altura fija para consistencia */
 }
 
 .btn-exportar {
-  background-color: #2ecc71 !important;
+  background-color: #10b981;
   color: white;
-  padding: 8px 12px;
-  margin-bottom: 1rem;
+  padding: 10px 20px;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-canvas {
-  width: 100% !important;
-  height: auto !important;
-  margin-top: 20px;
-  max-height: 400px;
-}
-.btn-limpiar {
-  background: #2ecc71;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
   font-weight: 600;
-  margin-left: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.btn-limpiar {
+  background: #64748b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-
-@media (max-width: 600px) {
-  .modal-content-dashboard {
-    padding: 15px;
-    background: white;
-    padding: 20px;
-    width: 100%;
-    max-width: 1200px;
-    border-radius: 10px;
-    position: relative;
-    box-sizing: border-box;
-    height: 100vh; /* para que no exceda altura de pantalla */
-    overflow-y: auto;
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 10px;
+    padding-bottom: 100px; /* Espacio para el nav inferior */
   }
-  .btn-limpiar {
-    margin-left: 0;
-    margin-top: 10px;
-  }
-    .btn-dashboard {
-        width: 50%;
-        margin-bottom: 10px;
-        margin-left: 25%;
-    }
+  
   .filtros-dashboard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .header-dashboard {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .cerrar {
-    padding: 5px 8px;
-    font-size: 14px;
+  .btn-exportar {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
-
