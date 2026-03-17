@@ -348,7 +348,7 @@ function generarColor(nombre) {
 
 function enviarWhatsApp(v) {
   if (!v.celular) return alert('Sin número')
-  const msg = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}`
+  const msg = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos}\n👀 Obsevaciones: ${v.observaciones}\n✅ Recomendaciones: ${v.recomendaciones}`
   window.open(`https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank')
 }
 
