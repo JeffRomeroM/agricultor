@@ -217,6 +217,7 @@ onUnmounted(() => {
   }
   .logo-container{
     display: none;
+    z-index: 100;
   }
 }
 </style>

@@ -144,6 +144,7 @@
           <button @click="editar(detalle)"><Icon icon="mdi:edit" class="nav-icon" /> Editar</button>
           <button class="eliminar" @click="confirmarEliminar(detalle.id)"><Icon icon="mdi:delete" class="nav-icon" /> Eliminar</button>
           <button @click="enviarWhatsApp(detalle)"><Icon icon="mdi:whatsapp" class="nav-icon" /> WhatsApp</button>
+          
         </div>
       </div>
     </div>
@@ -557,6 +558,7 @@ input[type="date"] {
   width: 100%;
   max-width: 600px;
   margin: auto;
+  margin-top: 10px;
   padding: 20px;
   position: relative;
   z-index: 2005;
@@ -672,10 +674,10 @@ input[type="date"] {
   color: white;
   border: none;
   border-radius: 50%;
-  padding: 6px 12px;
+  padding: 10px 16px;
   cursor: pointer;
   font-size: 16px;
-  z-index: 2100!important;
+  z-index: 4100!important;
   pointer-events: auto;
 }
 
