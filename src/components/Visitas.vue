@@ -1,12 +1,12 @@
 <template>
   <div class="app">
-  
     <h3>Visitas de Campo</h3>
-    
 
     <div class="filtros">
       <input v-model.lazy="filtroNombre" placeholder="Buscar por productor" class="buscar" />
-      <button class="btn-nueva" @click="abrirModal">+</button>
+      <button class="btn-nueva" @click="abrirModal">
+        <Icon icon="mdi:plus" />
+      </button>
       <input v-model="filtroFecha" type="date" />
       <button @click="limpiarFiltros" class="limpiar">Limpiar</button>
     </div>
@@ -17,9 +17,10 @@
     </div>
 
     <div v-else class="cards">
-      <div
-        v-for="v in visitas" :key="v.id"
-        class="card"
+      <div 
+        v-for="v in visitas" 
+        :key="v.id" 
+        class="card" 
         @click="verDetalle(v)"
       >
         <img v-if="v.foto_url" :src="v.foto_url" class="preview-foto" loading="lazy" />
@@ -30,50 +31,57 @@
         >
           {{ v.productor?.charAt(0).toUpperCase() || '?' }}
         </div>
+
         <p class="preview-productor">{{ v.productor }}</p>
         <p>{{ v.comunidad }}</p>
       </div>
     </div>
 
     <div class="paginacion" v-if="totalPaginas > 1">
-      <button @click="pagina--" :disabled="pagina === 1">Anterior</button>
+      <button @click="pagina--" :disabled="pagina === 1 || cargando">Anterior</button>
       <span>Página {{ pagina }} de {{ totalPaginas }}</span>
-      <button @click="pagina++" :disabled="pagina >= totalPaginas">Siguiente</button>
+      <button @click="pagina++" :disabled="pagina >= totalPaginas || cargando">Siguiente</button>
     </div>
 
     <div class="modal" v-if="mostrarModal">
       <div class="modal-content">
         <h2>{{ editando ? 'Editar' : 'Nueva' }} Visita</h2>
-        <form @submit.prevent="guardarVisita">
-          <input v-model="visita.productor" placeholder="Nombre del productor" required />
-          <input v-model="visita.celular" placeholder="Celular" type="tel" />
-          <input v-model="visita.comunidad" placeholder="Comunidad" required />
-          <input v-model="visita.cultivo" placeholder="Cultivo" required />
-          <input v-model="visita.area" placeholder="Área de cultivo" />
-          <textarea v-model="visita.hallazgos" placeholder="Principales Hallazgos"></textarea>
-          <textarea v-model="visita.recomendaciones" placeholder="Recomendaciones"></textarea>
-          <textarea v-model="visita.observaciones" placeholder="Observaciones"></textarea>
-          <input v-model="visita.fecha" type="date" required />
-          <select v-model="visita.tecnico" required>
-            <option disabled value="">Seleccione técnico</option>
-            <option value="Técnico 1">Técnico 1</option>
-            <option value="Técnico 2">Técnico 2</option>
-            <option value="Técnico 3">Técnico 3</option>
-          </select>
-          <input type="file" @change="subirFoto" accept="image/*" />
+        <form @submit.prevent="guardarVisita" class="form-container-responsive">
+          <div class="form-inputs">
+            <input v-model="visita.productor" placeholder="Nombre del productor" required />
+            <input v-model="visita.celular" placeholder="Celular" type="tel" />
+            <input v-model="visita.comunidad" placeholder="Comunidad" required />
+            <input v-model="visita.cultivo" placeholder="Cultivo" required />
+            <input v-model="visita.area" placeholder="Área de cultivo" />
+            <textarea v-model="visita.hallazgos" placeholder="Principales Hallazgos"></textarea>
+            <textarea v-model="visita.recomendaciones" placeholder="Recomendaciones"></textarea>
+            <textarea v-model="visita.observaciones" placeholder="Observaciones"></textarea>
+            <input v-model="visita.fecha" type="date" required />
+            <select v-model="visita.tecnico" required>
+              <option disabled value="">Seleccione técnico</option>
+              <option value="Técnico 1">Técnico 1</option>
+              <option value="Técnico 2">Técnico 2</option>
+              <option value="Técnico 3">Técnico 3</option>
+            </select>
+            <input type="file" @change="subirFoto" />
+          </div>
 
-          <div id="mapa"></div>
-          <button type="button" @click="obtenerUbicacion" class="btn-ubicacion">
-            Usar ubicación actual
-          </button>
-          <p v-if="visita.latitud && visita.longitud" class="ubicacion-info">
-            Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
-          </p>
+          <div class="form-mapa-section">
+            <div id="mapa"></div>
+            <button type="button" @click="obtenerUbicacion" class="btn-ubicacion">
+              Usar ubicación actual
+            </button>
+            <p v-if="visita.latitud && visita.longitud" class="ubicacion-info">
+              Ubicación seleccionada: {{ visita.latitud.toFixed(5) }}, {{ visita.longitud.toFixed(5) }}
+            </p>
 
-          <button type="submit" :disabled="subiendoFoto || cargando" class="btn-guardar">
-            {{ subiendoFoto ? 'Subiendo...' : 'Guardar' }}
-          </button>
-          <button type="button" @click="cerrarModal" class="btn-cancelar">Cancelar</button>
+            <div class="btn-group-main">
+              <button type="submit" :disabled="subiendoFoto || cargando" class="btn-guardar">
+                {{ subiendoFoto ? 'Subiendo...' : 'Guardar' }}
+              </button>
+              <button type="button" @click="cerrarModal" class="btn-cancelar">Cancelar</button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -87,50 +95,55 @@
             {{ detalle.productor?.charAt(0).toUpperCase() || '?' }}
           </div>
         </div>
-        <h3 class="subtitulo"> {{ detalle.fecha }}</h3>  
+        <h3 class="subtitulo"> {{ detalle.fecha }}</h3>
         <h2 class="titulo-detalle">{{ detalle.productor }}</h2>
-        
+
         <div class="seccion">
-          <h3> Datos generales</h3>
+          <h3>📋 Datos generales</h3>
           <div class="grid-datos">
-            <span><strong><Icon icon="mdi:account" class="nav-icon" />  Técnico:</strong> {{ detalle.tecnico }}</span>
-            <span><strong><Icon icon="mdi:plant" class="nav-icon" />  Cultivo:</strong> {{ detalle.cultivo }}</span>
-            <span><strong><Icon icon="mdi:phone" class="nav-icon" />  Celular:</strong> {{ detalle.celular || 'N/D' }}</span>
-            <span><strong><Icon icon="mdi:city" class="nav-icon" />  Comunidad:</strong> {{ detalle.comunidad }}</span>
-            <span><strong><Icon icon="mdi:map-marker" class="nav-icon" />  Área:</strong> {{ detalle.area }}</span>
+            <span><strong><Icon icon="mdi:account" class="nav-icon" /></strong> {{ detalle.tecnico }}</span>
+            <span><strong><Icon icon="mdi:leaf" class="nav-icon" /> Cultivo:</strong> {{ detalle.cultivo }}</span>
+            <span><strong><Icon icon="mdi:phone" class="nav-icon" /> Celular:</strong> {{ detalle.celular || 'N/D' }}</span>
+            <span><strong><Icon icon="mdi:place" class="nav-icon" /> Comunidad:</strong> {{ detalle.comunidad }}</span>
+            <span><strong><Icon icon="mdi:map" class="nav-icon" /> Área:</strong> {{ detalle.area }}</span>
           </div>
         </div>
 
         <div class="seccion" v-if="detalle.hallazgos">
-          <h3><Icon icon="mdi:magnify" class="nav-icon" />  Hallazgos</h3>
+          <h3><Icon icon="mdi:search" class="nav-icon" /> Hallazgos</h3>
           <ul>
-            <li v-for="l in detalle.hallazgos?.split('\n')" :key="l">{{ l }}</li>
+            <li v-for="l in detalle.hallazgos?.split('\n')" :key="l">
+              {{ l.replace(/^[-•]\s*/, '') }}
+            </li>
           </ul>
         </div>
 
         <div class="seccion" v-if="detalle.observaciones">
-          <h3><Icon icon="mdi:comment-text" class="nav-icon" />  Observaciones</h3>
+          <h3><Icon icon="mdi:eye" class="nav-icon" /> Observaciones</h3>
           <ul>
-            <li v-for="l in detalle.observaciones?.split('\n')" :key="l">{{ l }}</li>
+            <li v-for="l in detalle.observaciones?.split('\n')" :key="l">
+              {{ l.replace(/^[-•]\s*/, '') }}
+            </li>
           </ul>
         </div>
 
         <div class="seccion" v-if="detalle.recomendaciones">
-          <h3><Icon icon="mdi:check-circle" class="nav-icon" />  Recomendaciones</h3>
+          <h3><Icon icon="mdi:chart-arc" class="nav-icon" /> Recomendaciones</h3>
           <ul>
-            <li v-for="l in detalle.recomendaciones?.split('\n')" :key="l">{{ l }}</li>
+            <li v-for="l in detalle.recomendaciones?.split('\n')" :key="l">
+              {{ l.replace(/^[-•]\s*/, '') }}
+            </li>
           </ul>
         </div>
 
-        <a v-if="detalle.latitud && detalle.longitud" class="link-mapa"
-          :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank">
+        <a v-if="detalle.latitud" class="link-mapa" :href="`https://www.google.com/maps?q=${detalle.latitud},${detalle.longitud}`" target="_blank">
           <Icon icon="mdi:map-marker" class="nav-icon" /> Ver ubicación en Google Maps
         </a>
 
         <div class="acciones-detalle">
-          <button @click="editar(detalle)"><Icon icon="mdi:edit" class="nav-icon" />Editar</button>
-          <button class="eliminar" @click="confirmarEliminar(detalle.id)"><Icon icon="mdi:delete" class="nav-icon" />Eliminar</button>
-          <button @click="enviarWhatsApp(detalle)"><Icon icon="mdi:whatsapp" class="nav-icon" />WhatsApp</button>
+          <button @click="editar(detalle)"><Icon icon="mdi:edit" class="nav-icon" /> Editar</button>
+          <button class="eliminar" @click="confirmarEliminar(detalle.id)"><Icon icon="mdi:delete" class="nav-icon" /> Eliminar</button>
+          <button @click="enviarWhatsApp(detalle)"><Icon icon="mdi:whatsapp" class="nav-icon" /> WhatsApp</button>
         </div>
       </div>
     </div>
@@ -152,11 +165,8 @@ import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { supabase } from '../supabase.js'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-
 import { Icon } from '@iconify/vue'
 
-
-// --- ESTADO ---
 const visitas = ref([])
 const cargando = ref(false)
 const pagina = ref(1)
@@ -164,7 +174,6 @@ const porPagina = 10
 const totalPaginas = ref(1)
 const filtroNombre = ref('')
 const filtroFecha = ref('')
-
 const mostrarModal = ref(false)
 const mostrarModalEliminar = ref(false)
 const modalDetalle = ref(false)
@@ -172,116 +181,67 @@ const editando = ref(false)
 const subiendoFoto = ref(false)
 const idEliminar = ref(null)
 const detalle = ref({})
-const mostrarDashboard = ref(false)
 const map = ref(null)
 const marcador = ref(null)
 
-let timeoutBusqueda = null // Variable para controlar el tiempo de espera
-
 const visita = reactive({
-  id: null, productor: '', cultivo: '', hallazgos: '', celular: '',
-  area: '', comunidad: '', observaciones: '', recomendaciones: '',
-  fecha: '', tecnico: '', foto_url: '', latitud: null, longitud: null
+  id: null,
+  productor: '',
+  cultivo: '',
+  hallazgos: '',
+  celular: '',
+  area: '',
+  comunidad: '',
+  observaciones: '',
+  recomendaciones: '',
+  fecha: '',
+  tecnico: '',
+  foto_url: '',
+  latitud: null,
+  longitud: null
 })
 
-// --- CARGA DE DATOS OPTIMIZADA (SERVER-SIDE) ---
+// CARGAR DATOS CON PAGINACIÓN DE SERVIDOR
 async function cargarVisitas() {
   cargando.value = true
   const desde = (pagina.value - 1) * porPagina
   const hasta = desde + porPagina - 1
-
   try {
-    let query = supabase
-      .from('visitas')
-      .select('*', { count: 'exact' })
+    let query = supabase.from('visitas').select('*', { count: 'exact' })
+    if (filtroNombre.value) query = query.ilike('productor', `%${filtroNombre.value}%`)
+    if (filtroFecha.value) query = query.eq('fecha', filtroFecha.value)
+
+    const { data, count, error } = await query
       .order('fecha', { ascending: false })
       .range(desde, hasta)
 
-    if (filtroNombre.value) {
-      query = query.ilike('productor', `%${filtroNombre.value}%`)
-    }
-    if (filtroFecha.value) {
-      query = query.eq('fecha', filtroFecha.value)
-    }
-
-    const { data, count, error } = await query
     if (error) throw error
-
     visitas.value = data
     totalPaginas.value = Math.ceil(count / porPagina)
   } catch (err) {
-    console.error("Error:", err.message)
+    console.error(err)
   } finally {
     cargando.value = false
   }
 }
 
-// Escuchar cambios en filtros o página para recargar
 watch([pagina, filtroNombre, filtroFecha], () => {
+  if (filtroNombre.value || filtroFecha.value) pagina.value = 1
   cargarVisitas()
 })
 
-// --- FUNCIONES CRUD ---
-async function guardarVisita() {
-  cargando.value = true
-  const { id, ...datos } = visita
-  
-  let res
-  if (editando.value && id) {
-    res = await supabase.from('visitas').update(datos).eq('id', id)
-  } else {
-    res = await supabase.from('visitas').insert([datos])
-  }
-
-  if (!res.error) {
-    cerrarModal()
-    await cargarVisitas()
-  }
-  cargando.value = false
-}
-
-async function eliminar(id) {
-  cargando.value = true
-  // Primero obtener la URL de la foto para borrarla del storage
-  const { data } = await supabase.from('visitas').select('foto_url').eq('id', id).single()
-  
-  if (data?.foto_url) {
-    const path = data.foto_url.split('/public/')[1]?.split('fotos/')[1]
-    if (path) await supabase.storage.from('fotos').remove([`visitas/${path}`])
-  }
-
-  const { error } = await supabase.from('visitas').delete().eq('id', id)
-  if (!error) {
-    cerrarModalEliminar()
-    await cargarVisitas()
-  }
-  cargando.value = false
-}
-
-// --- IMAGENES Y MAPAS ---
-async function subirFoto(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  subiendoFoto.value = true
-  const fileName = `visitas/${Date.now()}_${file.name}`
-  const { error } = await supabase.storage.from('fotos').upload(fileName, file)
-  if (!error) {
-    const { data } = supabase.storage.from('fotos').getPublicUrl(fileName)
-    visita.foto_url = data.publicUrl
-  }
-  subiendoFoto.value = false
-}
-
 function initMapa() {
+  const container = document.getElementById('mapa')
+  if (!container) return
   if (map.value) {
     map.value.remove()
     map.value = null
   }
 
-  const latInit = visita.latitud || 12.131
-  const lngInit = visita.longitud || -86.2504
-  
-  map.value = L.map('mapa').setView([latInit, lngInit], 13)
+  const latInit = visita.latitud || 12.1124
+  const lngInit = visita.longitud || -84.4562
+
+  map.value = L.map('mapa').setView([latInit, lngInit], 14)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map.value)
 
   marcador.value = L.marker([latInit, lngInit], { draggable: true }).addTo(map.value)
@@ -290,33 +250,20 @@ function initMapa() {
     visita.latitud = pos.lat
     visita.longitud = pos.lng
   })
-
-  map.value.on('click', (e) => {
-    const { lat, lng } = e.latlng
-    visita.latitud = lat
-    visita.longitud = lng
-    marcador.value.setLatLng(e.latlng)
-  })
 }
 
-function obtenerUbicacion() {
-  navigator.geolocation.getCurrentPosition((pos) => {
-    const { latitude, longitude } = pos.coords
-    visita.latitud = latitude
-    visita.longitud = longitude
-    if (map.value) {
-      map.value.setView([latitude, longitude], 17)
-      marcador.value.setLatLng([latitude, longitude])
-    }
-  }, (err) => alert(err.message), { enableHighAccuracy: true })
-}
-
-// --- UTILIDADES ---
 function abrirModal() {
-  Object.assign(visita, { id: null, productor: '', foto_url: '', latitud: null, longitud: null })
+  Object.assign(visita, {
+    id: null,
+    productor: '',
+    foto_url: '',
+    latitud: 12.1124,
+    longitud: -84.4562,
+    fecha: new Date().toISOString().split('T')[0]
+  })
   editando.value = false
   mostrarModal.value = true
-  nextTick(() => setTimeout(initMapa, 100))
+  nextTick(() => setTimeout(initMapa, 300))
 }
 
 async function editar(v) {
@@ -324,109 +271,126 @@ async function editar(v) {
   editando.value = true
   mostrarModal.value = true
   modalDetalle.value = false
-  nextTick(() => setTimeout(initMapa, 100))
+  nextTick(() => setTimeout(initMapa, 300))
+}
+
+async function guardarVisita() {
+  cargando.value = true
+  const { id, ...datos } = visita
+  const res = editando.value 
+    ? await supabase.from('visitas').update(datos).eq('id', id) 
+    : await supabase.from('visitas').insert([datos])
+  
+  if (!res.error) {
+    cerrarModal()
+    cargarVisitas()
+  }
+  cargando.value = false
+}
+
+async function eliminar(id) {
+  await supabase.from('visitas').delete().eq('id', id)
+  cerrarModalEliminar()
+  cargarVisitas()
 }
 
 function cerrarModal() {
   mostrarModal.value = false
-  if (map.value) { map.value.remove(); map.value = null }
-}
-
-function verDetalle(v) { detalle.value = v; modalDetalle.value = true }
-function cerrarDetalle() { modalDetalle.value = false }
-function confirmarEliminar(id) { idEliminar.value = id; mostrarModalEliminar.value = true; modalDetalle.value = false }
-function cerrarModalEliminar() { mostrarModalEliminar.value = false; idEliminar.value = null }
-function limpiarFiltros() { filtroNombre.value = ''; filtroFecha.value = ''; pagina.value = 1 }
-
-function generarColor(nombre) {
-  let hash = 0
-  for (let i = 0; i < (nombre?.length || 0); i++) {
-    hash = nombre.charCodeAt(i) + ((hash << 5) - hash)
+  if (map.value) {
+    map.value.remove()
+    map.value = null
   }
-  return `hsl(${hash % 360}, 65%, 55%)`
 }
+
+function verDetalle(v) {
+  detalle.value = v
+  modalDetalle.value = true
+}
+
+function cerrarDetalle() {
+  modalDetalle.value = false
+}
+
+function confirmarEliminar(id) {
+  idEliminar.value = id
+  mostrarModalEliminar.value = true
+  modalDetalle.value = false
+}
+
+function cerrarModalEliminar() {
+  mostrarModalEliminar.value = false
+}
+
+function limpiarFiltros() {
+  filtroNombre.value = ''
+  filtroFecha.value = ''
+  pagina.value = 1
+}
+
+function generarColor(n) {
+  let h = 0
+  for (let i = 0; i < (n?.length || 0); i++) h = n.charCodeAt(i) + ((h << 5) - h)
+  return `hsl(${h % 360},65%, 55%)`
+}
+
+async function subirFoto(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  subiendoFoto.value = true
+  const path = `visitas/${Date.now()}_${file.name}`
+  const { error } = await supabase.storage.from('fotos').upload(path, file)
+  if (!error) {
+    const { data } = supabase.storage.from('fotos').getPublicUrl(path)
+    visita.foto_url = data.publicUrl
+  }
+  subiendoFoto.value = false
+}
+
+function obtenerUbicacion() {
+  navigator.geolocation.getCurrentPosition((pos) => {
+    visita.latitud = pos.coords.latitude
+    visita.longitud = pos.coords.longitude
+    if (map.value) {
+      map.value.setView([visita.latitud, visita.longitud], 17)
+      marcador.value.setLatLng([visita.latitud, visita.longitud])
+    }
+  })
+}
+
 
 function enviarWhatsApp(v) {
-  if (!v.celular) return alert('Sin número')
-  const msg = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos}\n👀 Obsevaciones: ${v.observaciones}\n✅ Recomendaciones: ${v.recomendaciones}`
-  window.open(`https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank')
+  if (!v.celular) return alert('Número de celular no disponible')
+  const mensaje = `📅 Fecha: ${v.fecha}\n👨‍🌾 Productor: ${v.productor}\n🌱 Cultivo: ${v.cultivo}\n🔍 Hallazgos: ${v.hallazgos || 'Ninguno'}\n📋 Observaciones: ${v.observaciones || 'Ninguna'}\n✅ Recomendaciones: ${v.recomendaciones || 'Ninguna'}`
+  const url = `https://wa.me/505${v.celular.replace(/\D/g, '')}?text=${encodeURIComponent(mensaje)}`
+  window.open(url, '_blank')
 }
 
 onMounted(cargarVisitas)
 </script>
 
 <style scoped>
-/* TUS ESTILOS ORIGINALES SIN TOCAR NINGUNO */
-:deep(#mapa) {
-  height: 300px;
-  width: 100%;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  z-index: 1;
-}
-
-.loader-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 30px 0;
-}
-
-.loader {
-  border: 4px solid #e0e0e0;
-  border-top: 4px solid #2ecc71;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loader-text {
-  color: #2ecc71;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-
 .app {
   max-width: 900px;
   margin: auto;
   padding: 20px;
   font-family: sans-serif;
 }
-.info {
-  display: flex;
-  text-align: right;
-  margin-bottom: 20px;
-}
-.logo {
-  width: 40px;
-  display: block;
-  margin-right: 20px;
-  border-radius: 5px;
-}
+
 .app h3 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-top: -10px;
 }
-.lista{
-  margin-top: 10px;
-  margin-left: 20px;
-}
+
 .filtros {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
   flex-wrap: wrap;
 }
-.buscar, input[type="date"] {
+
+.buscar,
+input[type="date"] {
   padding: 3px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -434,6 +398,7 @@ onMounted(cargarVisitas)
   max-width: 200px;
   box-sizing: border-box;
 }
+
 .btn-nueva {
   background-color: #2ecc71;
   color: white;
@@ -442,27 +407,35 @@ onMounted(cargarVisitas)
   padding: 0px 5px;
   cursor: pointer;
   font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .limpiar {
   background-color: #2ecc71;
   border: none;
   padding: 10px 5px;
   border-radius: 5px;
   color: white;
+  cursor: pointer;
 }
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
 }
+
 .card {
   border: 1px solid #ccc;
   padding: 8px;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
+
 .preview-foto {
   width: 100%;
   height: 120px;
@@ -470,53 +443,61 @@ onMounted(cargarVisitas)
   border-radius: 6px;
   margin-bottom: 6px;
 }
+
 .preview-productor {
   font-weight: bold;
 }
+
 .inicial-foto {
-  background-color: #2ecc71;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 55px;
-  box-sizing: border-box;
   font-weight: bold;
 }
 
 .modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   overflow-y: auto;
-  scroll-behavior: smooth;
 }
+
 .modal-content {
   background: white;
   padding: 20px;
   max-width: 500px;
   width: 90%;
-  height: auto;
   margin-top: 32vh;
   border-radius: 10px;
 }
-
-
-.btn-ubicacion {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 10px;
+.nav-icon{
+  color:#14a51c;
 }
+@media (min-width: 1024px) {
+  .modal-content {
+    max-width: 900px;
+    margin-top: 50px;
+  }
 
+  .form-container-responsive {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  #mapa {
+    height: 400px !important;
+  }
+}
 
 .modal-content input,
 .modal-content textarea,
@@ -528,9 +509,25 @@ onMounted(cargarVisitas)
   border: 1px solid #ccc;
   box-sizing: border-box;
 }
+
 #mapa {
   height: 250px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
 }
+
+.btn-ubicacion {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
 .btn-guardar {
   background-color: #2ecc71;
   color: white;
@@ -539,9 +536,9 @@ onMounted(cargarVisitas)
   border-radius: 5px;
   cursor: pointer;
   margin-right: 10px;
-  margin-left: 3px;
   font-weight: 600;
 }
+
 .btn-cancelar {
   background-color: #3498db;
   color: white;
@@ -550,125 +547,25 @@ onMounted(cargarVisitas)
   border-radius: 5px;
   cursor: pointer;
 }
+
 .pantalla-completa {
   background: white;
   overflow-y: auto;
 }
+
 .modal-detalle {
   width: 100%;
   max-width: 600px;
   margin: auto;
   padding: 20px;
   position: relative;
-}
-.detalle-foto {
-  width: 100%;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  object-fit: cover;
-}
-.detalle-info p {
-  text-align: left;
-  padding: 4px;
-}
-.acciones button {
-  margin: 5px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #2ecc71;
-  color: white;
-  cursor: pointer;
-}
-.acciones .eliminar {
-  background: #e74c3c;
-}
-.eliminarConf {
-  background: #e74c3c;
-  color: white;
-  border-radius: 5px;
-  padding: 6px 12px;
-  margin-right: 10px;
-  border: none;
-  cursor: pointer;
-}
-.cancelar {
-  background: #3498db;
-  color: white;
-  border-radius: 5px;
-  padding: 6px 12px;
-  border: none;
-  cursor: pointer;
-}
-.cerrar {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  padding: 5px 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-.ubicacion-info {
-  margin: 10px 0 15px 0;
-  font-weight: 600;
-  font-size: 0.9em;
-  color: #555;
-}
-
-.paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.paginacion button {
-  padding: 0.2rem 0.5rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #2ecc71;
-  color: white;
-  cursor: pointer;
-  font-size: 0.9em;
-  
-}
-.paginacion button:disabled {
-  background-color: #53f597;
-  cursor: not-allowed;
-}
-
-@media (max-width: 600px) {
-  .card {
-    width: 95%;
-    margin: auto;
-  }
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px 20px;
-  }
-  .buscar {
-    height: 35px;
-  }
-  .btn-nueva {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 0px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    font-size: 30px;
-  }
+  z-index: 2005;
 }
 
 .card-detalle {
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .detalle-imagen img,
@@ -696,7 +593,7 @@ onMounted(cargarVisitas)
 
 .subtitulo {
   text-align: end;
-  color: #000000;
+  color: #000;
   margin-top: 10px !important;
   margin-left: 50%;
 }
@@ -720,16 +617,13 @@ onMounted(cargarVisitas)
   font-size: 0.95em;
 }
 
-.seccion ul {
-  padding-left: 18px;
-}
-
 .link-mapa {
   display: block;
   margin: 15px 0;
   color: #3498db;
   font-weight: 600;
   text-align: center;
+  text-decoration: none;
 }
 
 .acciones-detalle {
@@ -751,5 +645,94 @@ onMounted(cargarVisitas)
 
 .acciones-detalle .eliminar {
   background: #e74c3c;
+}
+
+.eliminarConf{
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.cancelar {
+  background-color: #14a51c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.cerrar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 2100!important;
+  pointer-events: auto;
+}
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.paginacion button {
+  padding: 0.2rem 0.5rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #2ecc71;
+  color: white;
+  cursor: pointer;
+}
+
+.paginacion button:disabled {
+  background-color: #53f597;
+  cursor: not-allowed;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.loader {
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #2ecc71;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+  }
 }
 </style>
