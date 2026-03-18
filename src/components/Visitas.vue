@@ -558,7 +558,6 @@ input[type="date"] {
   width: 100%;
   max-width: 600px;
   margin: auto;
-  margin-top: 10px;
   padding: 20px;
   position: relative;
   z-index: 2005;
@@ -668,7 +667,7 @@ input[type="date"] {
 }
 .cerrar {
   position: absolute;
-  top: 10px;
+  top: 200px;
   right: 10px;
   background: red;
   color: white;
