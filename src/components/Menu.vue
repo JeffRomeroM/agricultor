@@ -260,9 +260,9 @@ onUnmounted(() => {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 30%;
     height: 60px;
-    background: white; /* Cambiado a sólido para el logo */
+    background: transparent; /* Cambiado a sólido para el logo */
     padding: 0 1.5rem;
     z-index: 1100;
   }

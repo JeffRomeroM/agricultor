@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Visitas from '../components/Visitas.vue'
-import Dashboard from '../components/Dashboard.vue';
-import Mapa from '../components/Mapa.vue';
+import Dashboard from '../views/Dashboard.vue';
+import Mapa from '../views/Mapa.vue';
 
 
 

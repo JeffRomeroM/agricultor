@@ -673,9 +673,15 @@ input[type="date"] {
   color: white;
   border: none;
   border-radius: 50%;
-  padding: 10px 16px;
+  padding: 10px ;
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-weight:900;
   cursor: pointer;
-  font-size: 16px;
   z-index: 4100!important;
   pointer-events: auto;
 }
