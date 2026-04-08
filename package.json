@@ -11,8 +11,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
     "chart.js": "^4.5.0",
+    "dexie": "^4.3.0",
     "leaflet": "^1.9.4",
-    "vite-plugin-pwa": "^1.0.1",
+    "vite-plugin-pwa": "^1.2.0",
     "vue": "^3.5.17",
     "vue-router": "^4.6.4"
   },

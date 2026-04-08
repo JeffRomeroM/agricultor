@@ -667,7 +667,7 @@ input[type="date"] {
 }
 .cerrar {
   position: absolute;
-  top: 200px;
+  top: 5px;
   right: 10px;
   background: red;
   color: white;
