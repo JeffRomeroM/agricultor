@@ -12,7 +12,7 @@ export default defineConfig({
         short_name: 'El agricultor',
         start_url: '/',
         display: 'standalone',
-        background_color: '#ffffff',
+        background_color: '#2ecc71',
         icons: [
           {
             src: 'logo.png',

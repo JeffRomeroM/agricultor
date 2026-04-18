@@ -268,7 +268,9 @@ onUnmounted(() => {
   }
 
   .header-hidden { transform: translateY(-100%); opacity: 0; }
-  .logo-mobile { width: 32px; }
+  .logo-mobile { 
+    width: 52px;
+  }
   .nav-links { flex-direction: row; width: 100%; justify-content: space-around; gap: 0; }
   .nav-item { width: 25%; height: 100%; border-radius: 0; }
   .nav-icon { font-size: 24px; margin-bottom: 2px; }

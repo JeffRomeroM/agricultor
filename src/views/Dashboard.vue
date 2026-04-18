@@ -2,10 +2,17 @@
   <div class="dashboard-container">
     <div class="header-dashboard">
       <h2>Dashboard de Visitas</h2>
-      <button class="btn-exportar" @click="exportarExcel">
-        <Icon icon="mdi:microsoft-excel" /> 
-        <span>Descargar Excel</span>
-      </button>
+      <div class="descargar">
+        <button class="btn-exportar" @click="exportarExcel">
+          <Icon icon="mdi:microsoft-excel" /> 
+          <span>Descargar Excel</span>
+        </button>
+
+        <button class="btn-exportar" @click="exportarPDF">
+          <Icon icon="mdi:pdf-box" />
+          <span>Descargar PDF</span>
+        </button>
+      </div>
     </div>
 
     <div class="filtros-dashboard">
@@ -61,8 +68,66 @@ const stats = computed(() => {
   return { tecnicos, comunidades }
 })
 
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
+
 const exportarExcel = () => {
-  alert("Generando reporte de visitas...")
+  const datos = visitas.value.map(v => ({
+    ID: v.id,
+    Fecha: v.fecha,
+    Técnico: v.tecnico,
+    Comunidad: v.comunidad,
+    Hallazgos: v.hallazgos,
+    Recomendaciones: v.recomendaciones,
+    Observaciones: v.observaciones
+  }))
+
+  const ws = XLSX.utils.json_to_sheet(datos)
+
+  // Ancho columnas
+  ws['!cols'] = [
+    { wch: 5 },
+    { wch: 12 },
+    { wch: 15 },
+    { wch: 20 },
+    { wch: 30 },
+    { wch: 30 },
+    { wch: 30 }
+  ]
+
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Visitas')
+
+  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+  const file = new Blob([excelBuffer], { type: 'application/octet-stream' })
+
+  saveAs(file, `visitas_${mesSeleccionado.value || 'todas'}.xlsx`)
+}
+
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
+const exportarPDF = () => {
+  const doc = new jsPDF()
+
+  const rows = visitas.value.map(v => [
+    v.id,
+    v.fecha,
+    v.tecnico,
+    v.comunidad,
+    v.hallazgos,
+    v.recomendaciones,
+    v.observaciones
+  ])
+
+  autoTable(doc, {
+    head: [['ID', 'Fecha', 'Técnico', 'Comunidad', 'Hallazgos', 'Recomendaciones', 'Observaciones']],
+    body: rows,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [46, 204, 113] } // verde
+  })
+
+  doc.save(`visitas_${mesSeleccionado.value || 'todas'}.pdf`)
 }
 
 onMounted(cargarVisitas)
@@ -129,11 +194,17 @@ onMounted(cargarVisitas)
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 25px;
 }
+.descargar{
+  display: flex;
+  width: 100%;
+  gap: 20px;
+
+}
 
 .btn-exportar {
-  background-color: #10b981;
+  background-color: #2ecc71;
   color: white;
-  padding: 12px 24px;
+  padding: 6px 18px;
   border: none;
   border-radius: 10px;
   font-weight: 700;
@@ -142,6 +213,7 @@ onMounted(cargarVisitas)
   align-items: center;
   gap: 10px;
   transition: transform 0.2s;
+  width: 150px!important;
 }
 
 .btn-limpiar {
