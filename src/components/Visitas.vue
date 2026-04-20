@@ -160,31 +160,47 @@
 
         <!-- imagen / cover -->
         <div class="cover">
+          
           <img v-if="detalle.foto_url" :src="detalle.foto_url" />
-
+          
           <div
             v-else
             class="cover inicial-foto"
             :style="{ backgroundColor: generarColor(detalle.productor) }"
           >
             {{ detalle.productor?.charAt(0).toUpperCase() || '?' }}
+            
           </div>
-
+          
           <div class="overlay">
             <h2>{{ detalle.productor }}</h2>
             <span>{{ detalle.comunidad }}</span>
+            
           </div>
+          
+          
+
         </div>
 
         <div class="detalle-info">
 
           <!-- info rápida -->
           <div class="info-grid">
-            <div><Icon icon="mdi:phone" /> {{ detalle.celular || '—' }}</div>
-            <div><Icon icon="mdi:leaf" /> {{ detalle.cultivo }}</div>
-            <div><Icon icon="mdi:ruler" /> {{ detalle.area }}</div>
-            <div><Icon icon="mdi:calendar" /> {{ detalle.fecha }}</div>
-            <div><Icon icon="mdi:account-hard-hat" /> {{ detalle.tecnico }}</div>
+            
+            <div class="tecnico"><Icon icon="mdi:account-hard-hat" /> {{ detalle.tecnico }}</div>
+            <div class="fec">
+              <div><Icon icon="mdi:phone" /> {{ detalle.celular || '—' }}  </div>
+
+              
+              <div><Icon icon="mdi:calendar" /> {{ detalle.fecha }}</div>
+            </div>
+            
+            <div class="fec">
+              
+              <div><Icon icon="mdi:leaf" /> {{ detalle.cultivo }}</div>
+              <div><Icon icon="mdi:ruler" /> {{ detalle.area }}</div>
+
+            </div>
           </div>
 
           <!-- bloques -->
@@ -693,6 +709,15 @@ input[type="date"] {
   z-index: 1000;
 }
 
+/* El contenedor .input-group obtendrá el estilo si su input interno tiene focus */
+.input-group:has(input:focus) {
+  outline: 2px solid #2ecc71;
+  border-radius: 8px; /* Opcional, para redondear el borde */
+}
+
+
+
+
 /* contenedor */
 .form-container {
   width: 100%;
@@ -781,7 +806,10 @@ textarea {
   margin-bottom: 10px;
   resize: none;
 }
-
+textarea:focus {
+  outline: 2px solid #2ecc71;
+  border-radius: 8px; /* Opcional, para redondear el borde */
+}
 /* mapa */
 #mapa {
   height: 200px;
@@ -944,14 +972,32 @@ textarea {
   gap: 8px;
   margin-bottom: 15px;
 }
+.info-grid .fec {
+  display: flex;
+  gap: auto;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
 
-.info-grid div {
+.info-grid  .fec div {
   background: #f4f6f7;
   padding: 8px;
   border-radius: 8px;
   font-size: 0.85rem;
   display: flex;
   gap: 5px;
+  width: 48%;
+}
+
+.info-grid .tecnico {
+  background: #f4f6f7;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: flex;
+  gap: 5px;
+  width: 99%;
+  
 }
 
 /* listas */
